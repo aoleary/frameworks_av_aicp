@@ -365,6 +365,13 @@ public:
     virtual status_t setAppVolume(const String8& packageName, const float value) = 0;
     virtual status_t setAppMute(const String8& packageName, const bool value) = 0;
     virtual status_t listAppVolumes(std::vector<media::AppVolume> *vols) = 0;
+
+    virtual status_t setRequestedLatencyMode(
+            audio_io_handle_t output, audio_latency_mode_t mode) = 0;
+
+    virtual status_t getSupportedLatencyModes(audio_io_handle_t output,
+            std::vector<audio_latency_mode_t>* modes) = 0;
+
 };
 
 /**
@@ -467,6 +474,10 @@ public:
     int32_t getAAudioMixerBurstCount() override;
     int32_t getAAudioHardwareBurstMinUsec() override;
     status_t setDeviceConnectedState(const struct audio_port_v7 *port, bool connected) override;
+    status_t setRequestedLatencyMode(audio_io_handle_t output,
+            audio_latency_mode_t mode) override;
+    status_t getSupportedLatencyModes(
+            audio_io_handle_t output, std::vector<audio_latency_mode_t>* modes) override;
 
     status_t setAppVolume(const String8& packageName, const float value) override;
     status_t setAppMute(const String8& packageName, const bool value) override;
@@ -563,6 +574,8 @@ public:
             SET_APP_VOLUME = media::BnAudioFlingerService::TRANSACTION_setAppVolume,
             SET_APP_MUTE = media::BnAudioFlingerService::TRANSACTION_setAppMute,
             LIST_APP_VOLUMES = media::BnAudioFlingerService::TRANSACTION_listAppVolumes,
+            SET_REQUESTED_LATENCY_MODE = media::BnAudioFlingerService::TRANSACTION_setRequestedLatencyMode,
+            GET_SUPPORTED_LATENCY_MODES = media::BnAudioFlingerService::TRANSACTION_getSupportedLatencyModes,
         };
 
     protected:
@@ -689,6 +702,9 @@ public:
     Status setAppMute(const std::string& packageName, const bool value) override;
     Status listAppVolumes(std::vector<media::AppVolumeData> *vols) override;
 
+    Status setRequestedLatencyMode(int output, media::LatencyMode mode) override;
+    Status getSupportedLatencyModes(int output,
+            std::vector<media::LatencyMode>* _aidl_return) override;
 private:
     const sp<AudioFlingerServerAdapter::Delegate> mDelegate;
 };
